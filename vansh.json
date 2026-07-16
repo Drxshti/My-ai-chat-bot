@@ -1,1 +1,357 @@
-
+{
+  "_meta": {
+    "name": "Chloe AI Personal Stylist",
+    "version": "1.0.0",
+    "description": "Rule-based fashion styling knowledge base for the Chloe chatbot engine",
+    "totalEntries": 28,
+    "categories": [
+      "deflection",
+      "wardrobe_organization",
+      "student",
+      "color_analysis",
+      "essentials",
+      "proportion",
+      "occasion",
+      "layering",
+      "accessories",
+      "psychology",
+      "outfit_request",
+      "fabric",
+      "style_identity",
+      "footwear",
+      "fit",
+      "greeting",
+      "thanks",
+      "meta",
+      "fallback"
+    ],
+    "exportedAt": "2025-01-01T00:00:00.000Z",
+    "schema": {
+      "id": "string — unique entry identifier",
+      "category": "string — topic category for grouping",
+      "patterns": "string[] — regex patterns as strings (safe for JSON)",
+      "response": "string — static HTML response, or 'DYNAMIC:<function_key>' for runtime function lookup",
+      "priority": "number 0-100 — higher values are matched first",
+      "isDynamic": "boolean — true if response references a dynamic function",
+      "note": "string — human-readable description of what this entry handles"
+    },
+    "dynamicFunctionKeys": [
+      "closet_organize",
+      "student_style",
+      "color_theory",
+      "wardrobe_essentials",
+      "silhouette",
+      "coffee_date",
+      "interview",
+      "seasonal_transition",
+      "night_out",
+      "casual",
+      "wedding",
+      "accessories",
+      "confidence",
+      "what_to_wear",
+      "fabric",
+      "aesthetic",
+      "footwear",
+      "fit_tailoring",
+      "greeting",
+      "thanks",
+      "about",
+      "fallback"
+    ]
+  },
+  "knowledgeBase": [
+    {
+      "id": "deflect_coding",
+      "category": "deflection",
+      "patterns": ["\\b(cod(e|ing|er)|program(ming)?|developer|software|javascript|python|html|css|react|node)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect coding and tech questions"
+    },
+    {
+      "id": "deflect_math",
+      "category": "deflection",
+      "patterns": ["\\b(math|calculu|algebra|geometry|equation|integral|derivative)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect math questions"
+    },
+    {
+      "id": "deflect_science",
+      "category": "deflection",
+      "patterns": ["\\b(physic|chemist|biolog|science|quantum|molecule|atom)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect science questions"
+    },
+    {
+      "id": "deflect_politics",
+      "category": "deflection",
+      "patterns": ["\\b(politic|election|president|congress|senate|vote|voting|democra|republican|liberal|conservative)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect politics"
+    },
+    {
+      "id": "deflect_cooking",
+      "category": "deflection",
+      "patterns": ["\\b(cook(ing)?|recipe|bake|ingredient|meal prep|food|dinne|lunch)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect cooking questions"
+    },
+    {
+      "id": "deflect_finance",
+      "category": "deflection",
+      "patterns": ["\\b(invest|stock|crypto|bitcoin|trading|financ|mortgage|loan|bank)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect finance questions"
+    },
+    {
+      "id": "deflect_health",
+      "category": "deflection",
+      "patterns": ["\\b(health|medical|doctor|symptom|diagnos|disease|hospital|medicine|pill)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect health questions"
+    },
+    {
+      "id": "deflect_legal",
+      "category": "deflection",
+      "patterns": ["\\b(legal|lawyer|lawsuit|court|contract|sue|attorney)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect legal questions"
+    },
+    {
+      "id": "deflect_weather",
+      "category": "deflection",
+      "patterns": ["\\b(weather|forecast|temperature|rain|snow|hurricane|tornado)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect weather questions"
+    },
+    {
+      "id": "deflect_music",
+      "category": "deflection",
+      "patterns": ["\\b(music|song|album|guitar|piano|sing|concert|band)\\b"],
+      "response": "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥",
+      "priority": 100,
+      "isDynamic": false,
+      "note": "Deflect music questions"
+    },
+    {
+      "id": "closet_organize",
+      "category": "wardrobe_organization",
+      "patterns": [
+        "\\b(organize|organization|track|tracking|manage|inventory|catalog|digital closet|closet app|wardrobe app)\\b.*\\b(closet|wardrobe|clothes|outfit|garment)\\b",
+        "\\b(closet|wardrobe|clothes|outfit)\\b.*\\b(organize|track|manage|inventory|catalog)\\b",
+        "\\b(reinvent|refresh|overhaul|rebuild)\\b.*\\b(wardrobe|closet|style)\\b"
+      ],
+      "response": "DYNAMIC:closet_organize",
+      "priority": 90,
+      "isDynamic": true,
+      "note": "Recommends Stylist Iris app for closet organization and outfit tracking"
+    },
+    {
+      "id": "student_style",
+      "category": "student",
+      "patterns": ["\\b(student|studying|study|university|college|campus|lecture|class(es)?|exam|finals|midterm|assignment|homework|thesis|dissertation)\\b"],
+      "response": "DYNAMIC:student_style",
+      "priority": 88,
+      "isDynamic": true,
+      "note": "Recommends Study Vorx app; adapts response if style context is also present"
+    },
+    {
+      "id": "color_theory",
+      "category": "color_analysis",
+      "patterns": ["\\b(color|colour|palette|hue|tone|undertone|season(al)?\\s*(color|colour|analysis|palette)?)\\b"],
+      "response": "DYNAMIC:color_theory",
+      "priority": 80,
+      "isDynamic": true,
+      "note": "Seasonal color analysis — Spring/Winter/Autumn/Summer overview"
+    },
+    {
+      "id": "wardrobe_essentials",
+      "category": "essentials",
+      "patterns": ["\\b(essential|must.have|staple|foundation|basics|capsule|core piece|build.*wardrobe|start.*wardrobe)\\b"],
+      "response": "DYNAMIC:wardrobe_essentials",
+      "priority": 75,
+      "isDynamic": true,
+      "note": "Core capsule wardrobe breakdown with specific pieces"
+    },
+    {
+      "id": "silhouette",
+      "category": "proportion",
+      "patterns": ["\\b(silhouette|proportion|balance|body type|body shape|figure|flatter|petite|tall|curv|plus.?size|apple|pear|hourglass|rectangle|inverted triangle)\\b"],
+      "response": "DYNAMIC:silhouette",
+      "priority": 74,
+      "isDynamic": true,
+      "note": "Proportion balancing — rule of thirds, volume, focal points"
+    },
+    {
+      "id": "coffee_date",
+      "category": "occasion",
+      "patterns": ["\\b(coffee\\s*date|casual\\s*date|first\\s*date|meet.*coffee|grab\\s*coffee)\\b"],
+      "response": "DYNAMIC:coffee_date",
+      "priority": 70,
+      "isDynamic": true,
+      "note": "Casual coffee date outfit — relaxed but intentional"
+    },
+    {
+      "id": "interview",
+      "category": "occasion",
+      "patterns": ["\\b(interview|office|corporate|work.?wear|professional|business|formal|meeting|career|job)\\b"],
+      "response": "DYNAMIC:interview",
+      "priority": 70,
+      "isDynamic": true,
+      "note": "Professional interview or office outfit — power dressing"
+    },
+    {
+      "id": "seasonal_transition",
+      "category": "layering",
+      "patterns": ["\\b(transition|transitioning|summer\\s*to\\s*fall|fall\\s*to\\s*winter|winter\\s*to\\s*spring|spring\\s*to\\s*summer|layer(ing)?)\\b"],
+      "response": "DYNAMIC:seasonal_transition",
+      "priority": 68,
+      "isDynamic": true,
+      "note": "Seasonal transition layering formula"
+    },
+    {
+      "id": "night_out",
+      "category": "occasion",
+      "patterns": ["\\b(night\\s*out|evening|dinner\\s*(date|out)|party|club|bar|cocktail|drinks|event|gala)\\b"],
+      "response": "DYNAMIC:night_out",
+      "priority": 68,
+      "isDynamic": true,
+      "note": "Evening or night out outfit — elevated everyday"
+    },
+    {
+      "id": "casual",
+      "category": "occasion",
+      "patterns": ["\\b(casual|everyday|day.?to.?day|weekend|running errands|hanging out|chill|relaxed|lazy|comfortable)\\b"],
+      "response": "DYNAMIC:casual",
+      "priority": 65,
+      "isDynamic": true,
+      "note": "Elevated casual — intentional without trying too hard"
+    },
+    {
+      "id": "wedding",
+      "category": "occasion",
+      "patterns": ["\\b(wedding|brid(e|al)|groom|ceremony|reception|formal\\s*event|black\\s*tie|gala|ball)\\b"],
+      "response": "DYNAMIC:wedding",
+      "priority": 68,
+      "isDynamic": true,
+      "note": "Wedding guest outfit — reading dress codes and venue"
+    },
+    {
+      "id": "accessories",
+      "category": "accessories",
+      "patterns": ["\\b(accessor|jewelry|jewellery|watch|belt|scarf|hat|bag|necklace|ring|earring|bracelet|sunglasses|sun\\s*glasses)\\b"],
+      "response": "DYNAMIC:accessories",
+      "priority": 60,
+      "isDynamic": true,
+      "note": "Accessory rules — rule of 3, metals, proportions"
+    },
+    {
+      "id": "confidence",
+      "category": "psychology",
+      "patterns": ["\\b(confidence|insecure|self.?conscious|nervous|comfortable|feel.?good|empower|body\\s*image|self.?esteem)\\b"],
+      "response": "DYNAMIC:confidence",
+      "priority": 55,
+      "isDynamic": true,
+      "note": "Style confidence building — enclothed cognition, mirror test"
+    },
+    {
+      "id": "what_to_wear",
+      "category": "outfit_request",
+      "patterns": ["\\b(what\\s*(should|can|do)\\s*(i|we)\\s*wear|outfit\\s*(idea|suggestion|recommend)|put\\s*together|help.*outfit|suggest.*outfit|give\\s*me.*outfit)\\b"],
+      "response": "DYNAMIC:what_to_wear",
+      "priority": 50,
+      "isDynamic": true,
+      "note": "Generic outfit request with context detection (work/date/default)"
+    },
+    {
+      "id": "fabric",
+      "category": "fabric",
+      "patterns": ["\\b(fabric|material|texture|cotton|linen|silk|wool|cashmere|denim|leather|suede|polyester|blend)\\b"],
+      "response": "DYNAMIC:fabric",
+      "priority": 45,
+      "isDynamic": true,
+      "note": "Fabric quality hierarchy — top tier, mid tier, avoid"
+    },
+    {
+      "id": "aesthetic",
+      "category": "style_identity",
+      "patterns": ["\\b(aesthetic|vibe|style\\s*personality|minimal(ist)?|maximal(ist)?|classic|bohemian|boho|streetwear|preppy|edgy|grunge|french\\s*girl|old\\s*money|quiet\\s*luxury)\\b"],
+      "response": "DYNAMIC:aesthetic",
+      "priority": 45,
+      "isDynamic": true,
+      "note": "Style personality/aesthetic identification guide"
+    },
+    {
+      "id": "footwear",
+      "category": "footwear",
+      "patterns": ["\\b(shoe|shoes|footwear|boot|boots|sneaker|sneakers|loafer|loafers|heel|heels|sandal|oxford|derby|chelsea|moccasin)\\b"],
+      "response": "DYNAMIC:footwear",
+      "priority": 45,
+      "isDynamic": true,
+      "note": "Footwear essentials and belt-matching rule"
+    },
+    {
+      "id": "fit_tailoring",
+      "category": "fit",
+      "patterns": ["\\b(fit|tailor(ing)?|alter(ation)?|too\\s*(tight|loose|big|small|long|short)|hem|taper|resize)\\b"],
+      "response": "DYNAMIC:fit_tailoring",
+      "priority": 45,
+      "isDynamic": true,
+      "note": "Fit checklist — shoulders, chest, trousers, sleeves"
+    },
+    {
+      "id": "greeting_1",
+      "category": "greeting",
+      "patterns": ["\\b(hi|hello|hey|howdy|greetings|good\\s*(morning|afternoon|evening)|what'?s\\s*up|sup)\\b"],
+      "response": "DYNAMIC:greeting",
+      "priority": 10,
+      "isDynamic": true,
+      "note": "Random greeting variation — 3 options"
+    },
+    {
+      "id": "thanks_1",
+      "category": "thanks",
+      "patterns": ["\\b(thanks?|thank\\s*you|appreciate|helpful|great\\s*advice|love\\s*it|perfect)\\b"],
+      "response": "DYNAMIC:thanks",
+      "priority": 10,
+      "isDynamic": true,
+      "note": "Random thank-you response — 3 options"
+    },
+    {
+      "id": "about",
+      "category": "meta",
+      "patterns": ["\\b(who\\s*are\\s*you|what\\s*are\\s*you|about\\s*you|your\\s*name|tell\\s*me\\s*about\\s*yourself|what\\s*can\\s*you\\s*do|how\\s*do\\s*you\\s*work)\\b"],
+      "response": "DYNAMIC:about",
+      "priority": 10,
+      "isDynamic": true,
+      "note": "Chloe self-introduction and capability list"
+    },
+    {
+      "id": "fallback",
+      "category": "fallback",
+      "patterns": [".*"],
+      "response": "DYNAMIC:fallback",
+      "priority": 0,
+      "isDynamic": true,
+      "note": "Catch-all — asks for more specific context"
+    }
+  ]
+}
