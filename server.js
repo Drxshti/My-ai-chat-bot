@@ -10,7 +10,7 @@ app.use(cors());
 // Initialize the Google Gen AI SDK
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Define Ana's personality and instructions
+// Define Chloe's personality and instructions
 const SYSTEM_PROMPT = `
 You are Chloe, a high-end, sophisticated personal stylist. 
 Your tone is elegant, honest but polite, concise, and deeply knowledgeable about fashion.
@@ -44,5 +44,5 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✨ Stylist Ana backend is running on http://localhost:${PORT}`);
+  console.log(`✨ Stylist Chloe backend is running on http://localhost:${PORT}`);
 });
