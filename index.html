@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stylist Ana</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    /* Main App Container */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      background-color: #FDFBF7;
+      color: #2D2D2D;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 24px 16px;
+      background-color: #FDFBF7;
+      z-index: 10;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #333;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .header-title {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-title span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .header-title h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .header-title .underline {
+      width: 16px;
+      height: 2px;
+      background-color: #CBA461;
+      margin-top: 4px;
+      border-radius: 2px;
+    }
+
+    /* Scrollable Content Area */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 24px 120px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Intro Section */
+    #introSection {
+      transition: opacity 0.3s ease;
+    }
+
+    .intro-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .intro-label .line {
+      width: 32px;
+      height: 1px;
+      background-color: #CBA461;
+    }
+
+    .intro-label span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #CBA461;
+      text-transform: uppercase;
+    }
+
+    .greeting {
+      font-size: 44px;
+      font-weight: 300;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .greeting span {
+      font-weight: 500;
+      color: #CBA461;
+      font-style: italic;
+    }
+
+    .description {
+      color: #6B6B6B;
+      font-size: 17px;
+      line-height: 1.5;
+      margin-bottom: 40px;
+    }
+
+    /* Action List */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .action-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .action-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 0;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .action-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .action-content i {
+      color: #CBA461;
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .action-content span {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    /* Chat Interface Styles */
+    #chatHistory {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: #2D2D2D;
+      color: #FDFBF7;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.ana {
+      align-self: flex-start;
+      background-color: white;
+      color: #2D2D2D;
+      border: 1px solid #EAEAEA;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    /* Style markdown content in Ana's messages */
+    .message.ana p { margin-bottom: 8px; }
+    .message.ana p:last-child { margin-bottom: 0; }
+    .message.ana ul { margin-left: 20px; margin-bottom: 8px; }
+    .message.ana strong { color: #CBA461; }
+
+    .typing-indicator {
+      align-self: flex-start;
+      color: #888;
+      font-size: 13px;
+      font-style: italic;
+      display: none;
+    }
+
+    /* Bottom Input Area */
+    .input-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 24px 20px 30px;
+      background: linear-gradient(to top, #FDFBF7 85%, transparent);
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .camera-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: white;
+      border: 1px solid #f0f0f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      color: #333;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .text-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .text-input-wrapper input {
+      width: 100%;
+      height: 48px;
+      border-radius: 24px;
+      border: 1px solid #f0f0f0;
+      padding: 0 20px;
+      font-size: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      outline: none;
+    }
+
+    .text-input-wrapper input:focus {
+      border-color: #CBA461;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #E5D7BE;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+
+    .send-btn:hover, .send-btn.active {
+      background-color: #CBA461;
+    }
+
+    .disclaimer {
+      text-align: center;
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <button class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
+      <div class="header-title">
+        <span>Personal Stylist</span>
+        <h1>Ana</h1>
+        <div class="underline"></div>
+      </div>
+      <button class="icon-btn"><i class="fa-solid fa-rotate-right" onclick="location.reload()"></i></button>
+    </header>
+
+    <main id="mainContainer">
+      <div id="introSection">
+        <div class="intro-label">
+          <div class="line"></div>
+          <span>Introducing</span>
+        </div>
+        
+        <h2 class="greeting">
+          Hi. I'm <span>Ana.</span>
+        </h2>
+        
+        <p class="description">
+          Your private stylist. Send a photo for a fit read, or pick a starting point below and I'll take it from there.
+        </p>
+
+        <span class="section-title">Where to begin</span>
+        
+        <div class="action-list">
+          <button class="action-btn" onclick="fillInput('What colors suit me best?')">
+            <div class="action-content">
+              <i class="fa-solid fa-palette"></i>
+              <span>Find colours that suit me</span>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+
+          <button class="action-btn" onclick="fillInput('What is quietly trending right now?')">
+            <div class="action-content">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>What's quietly trending right now?</span>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+
+          <button class="action-btn" onclick="fillInput('Build me a 5-piece capsule wardrobe')">
+            <div class="action-content">
+              <i class="fa-solid fa-shirt"></i>
+              <span>Build me a capsule wardrobe</span>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="chatHistory"></div>
+      <div id="typingIndicator" class="typing-indicator">Ana is thinking...</div>
+    </main>
+
+    <div class="input-area">
+      <div class="input-container">
+        <button class="camera-btn" onclick="alert('Camera integration requires file-upload logic to be added!')">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+        <div class="text-input-wrapper">
+          <input type="text" id="chatInput" placeholder="Ask Ana anything..." oninput="checkInput()">
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <i class="fa-solid fa-arrow-up"></i>
+        </button>
+      </div>
+      <p class="disclaimer">Ana can make mistakes. Check the details that matter.</p>
+    </div>
+  </div>
+
+  <script>
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const introSection = document.getElementById('introSection');
+    const chatHistory = document.getElementById('chatHistory');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const mainContainer = document.getElementById('mainContainer');
+
+    function fillInput(text) {
+      chatInput.value = text;
+      checkInput();
+      sendMessage();
+    }
+
+    function checkInput() {
+      if (chatInput.value.trim().length > 0) {
+        sendBtn.classList.add('active');
+      } else {
+        sendBtn.classList.remove('active');
+      }
+    }
+
+    function appendMessage(sender, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', sender);
+      
+      if (sender === 'ana') {
+        // Parse markdown for Ana's responses
+        msgDiv.innerHTML = marked.parse(text);
+      } else {
+        // Plain text for user
+        msgDiv.textContent = text;
+      }
+      
+      chatHistory.appendChild(msgDiv);
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      mainContainer.scrollTop = mainContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = chatInput.value.trim();
+      if (!message) return;
+
+      // Hide intro screen on first message
+      if (introSection.style.display !== 'none') {
+        introSection.style.display = 'none';
+      }
+
+      // 1. Show User Message
+      appendMessage('user', message);
+      chatInput.value = "";
+      checkInput();
+
+      // 2. Show loading indicator
+      typingIndicator.style.display = 'block';
+      scrollToBottom();
+
+      try {
+        // 3. Send to Backend
+        const response = await fetch('http://localhost:3000/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+        
+        // 4. Hide loading and show Ana's response
+        typingIndicator.style.display = 'none';
+        appendMessage('ana', data.reply);
+
+      } catch (error) {
+        typingIndicator.style.display = 'none';
+        appendMessage('ana', "I seem to have lost my connection. Please try again in a moment.");
+      }
+    }
+
+    chatInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
