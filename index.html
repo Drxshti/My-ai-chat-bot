@@ -215,7 +215,7 @@
       border-bottom-right-radius: 4px;
     }
 
-    .message.ana {
+    .message.chloe {
       align-self: flex-start;
       background-color: white;
       color: #2D2D2D;
@@ -224,11 +224,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
 
-    /* Style markdown content in Ana's messages */
-    .message.ana p { margin-bottom: 8px; }
-    .message.ana p:last-child { margin-bottom: 0; }
-    .message.ana ul { margin-left: 20px; margin-bottom: 8px; }
-    .message.ana strong { color: #CBA461; }
+    /* Style markdown content in Chloe's messages */
+    .message.chloe p { margin-bottom: 8px; }
+    .message.chloe p:last-child { margin-bottom: 0; }
+    .message.chloe ul { margin-left: 20px; margin-bottom: 8px; }
+    .message.chloe strong { color: #CBA461; }
 
     .typing-indicator {
       align-self: flex-start;
@@ -323,7 +323,7 @@
       <button class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
       <div class="header-title">
         <span>Personal Stylist</span>
-        <h1>Ana</h1>
+        <h1>Chloe</h1>
         <div class="underline"></div>
       </div>
       <button class="icon-btn"><i class="fa-solid fa-rotate-right" onclick="location.reload()"></i></button>
@@ -337,7 +337,7 @@
         </div>
         
         <h2 class="greeting">
-          Hi. I'm <span>Ana.</span>
+          Hi. I'm <span>Chloe.</span>
         </h2>
         
         <p class="description">
@@ -374,7 +374,7 @@
       </div>
 
       <div id="chatHistory"></div>
-      <div id="typingIndicator" class="typing-indicator">Ana is thinking...</div>
+      <div id="typingIndicator" class="typing-indicator">Chloe is thinking...</div>
     </main>
 
     <div class="input-area">
@@ -383,13 +383,13 @@
           <i class="fa-solid fa-camera"></i>
         </button>
         <div class="text-input-wrapper">
-          <input type="text" id="chatInput" placeholder="Ask Ana anything..." oninput="checkInput()">
+          <input type="text" id="chatInput" placeholder="Ask Chloe anything..." oninput="checkInput()">
         </div>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">
           <i class="fa-solid fa-arrow-up"></i>
         </button>
       </div>
-      <p class="disclaimer">Ana can make mistakes. Check the details that matter.</p>
+      <p class="disclaimer">Chloe can make mistakes. Check the details that matter.</p>
     </div>
   </div>
 
@@ -419,8 +419,8 @@
       const msgDiv = document.createElement('div');
       msgDiv.classList.add('message', sender);
       
-      if (sender === 'ana') {
-        // Parse markdown for Ana's responses
+      if (sender === 'chloe') {
+        // Parse markdown for Chloe's responses
         msgDiv.innerHTML = marked.parse(text);
       } else {
         // Plain text for user
@@ -463,13 +463,13 @@
 
         const data = await response.json();
         
-        // 4. Hide loading and show Ana's response
+        // 4. Hide loading and show Chloe's response
         typingIndicator.style.display = 'none';
-        appendMessage('ana', data.reply);
+        appendMessage('chloe', data.reply);
 
       } catch (error) {
         typingIndicator.style.display = 'none';
-        appendMessage('ana', "I seem to have lost my connection. Please try again in a moment.");
+        appendMessage('chloe', "I seem to have lost my connection. Please try again in a moment.");
       }
     }
 
