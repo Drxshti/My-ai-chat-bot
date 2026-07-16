@@ -1,550 +1,1455 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stylist Chloe - Coquette</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Pacifico&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    /* Soft Coquette Reset & Base */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Nunito', sans-serif;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chloe — AI Personal Stylist</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --bg-deep: #F0EDE8;
+    --fg: #1A1714;
+    --fg-muted: #7A746B;
+    --accent: #B8860B;
+    --accent-light: #D4A843;
+    --accent-glow: rgba(184, 134, 11, 0.15);
+    --card: #FFFFFF;
+    --card-shadow: rgba(26, 23, 20, 0.06);
+    --border: rgba(26, 23, 20, 0.08);
+    --chloe-bg: #1A1714;
+    --chloe-fg: #FAF8F5;
+    --user-bg: #F5F0E8;
+    --user-fg: #1A1714;
+    --typing-dot: #B8860B;
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow: hidden;
+  }
+
+  /* Ambient background */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .ambient::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBlob 18s ease-in-out infinite;
+  }
+  .ambient::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -15%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(184,134,11,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBlob 22s ease-in-out infinite reverse;
+  }
+  @keyframes floatBlob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  /* App Shell */
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 320px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    box-shadow: 2px 0 20px var(--card-shadow);
+  }
+  .sidebar-header {
+    padding: 32px 28px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .brand-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--chloe-bg);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-light);
+    font-size: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, var(--accent-glow));
+  }
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: var(--fg);
+  }
+  .brand-tagline {
+    font-size: 12.5px;
+    color: var(--fg-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .sidebar-section {
+    padding: 20px 28px;
+  }
+  .sidebar-section-title {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--fg-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .quick-prompt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: var(--fg);
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  .quick-prompt:hover {
+    background: var(--bg);
+    border-color: var(--border);
+  }
+  .quick-prompt:active {
+    transform: scale(0.98);
+  }
+  .quick-prompt i {
+    color: var(--accent);
+    width: 18px;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+  }
+  .clear-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .clear-btn:hover {
+    border-color: #c0392b;
+    color: #c0392b;
+    background: rgba(192,57,43,0.04);
+  }
+
+  /* Main Chat Area */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .chat-header {
+    padding: 20px 32px;
+    background: rgba(250,248,245,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 5;
+  }
+  .chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #27ae60;
+    border-radius: 50%;
+    position: relative;
+  }
+  .status-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1.5px solid #27ae60;
+    animation: pulse-ring 2s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  .chat-header-text {
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .chat-header-text strong {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .msg-count {
+    font-size: 12px;
+    color: var(--fg-muted);
+    background: var(--bg-deep);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* Messages Container */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .message {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 28px;
+    animation: msgIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  @keyframes msgIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .msg-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .message.chloe .msg-avatar {
+    background: var(--chloe-bg);
+    color: var(--accent-light);
+  }
+  .message.user .msg-avatar {
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .msg-bubble {
+    max-width: 520px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height: 1.7;
+    position: relative;
+  }
+  .message.chloe .msg-bubble {
+    background: var(--card);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-top-left-radius: 6px;
+    box-shadow: 0 2px 12px var(--card-shadow);
+  }
+  .message.user .msg-bubble {
+    background: var(--chloe-bg);
+    color: var(--chloe-fg);
+    border-top-right-radius: 6px;
+  }
+
+  .msg-bubble p { margin-bottom: 8px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+
+  .msg-bubble .highlight {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .msg-bubble .outfit-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 10px 0;
+  }
+  .message.user .outfit-block {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .outfit-block .outfit-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .outfit-block .outfit-item {
+    font-size: 13.5px;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .outfit-block .outfit-item i {
+    color: var(--accent);
+    width: 16px;
+    font-size: 11px;
+  }
+
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--fg-muted);
+    margin-top: 6px;
+    padding: 0 4px;
+  }
+  .message.user .msg-time {
+    text-align: right;
+    color: rgba(250,248,245,0.4);
+  }
+
+  /* Typing Indicator */
+  .typing-indicator {
+    display: none;
+    gap: 14px;
+    margin-bottom: 28px;
+    align-items: flex-start;
+  }
+  .typing-indicator.visible { display: flex; }
+  .typing-dots {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    border-top-left-radius: 6px;
+    padding: 16px 22px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    box-shadow: 0 2px 12px var(--card-shadow);
+  }
+  .typing-dots span {
+    width: 7px;
+    height: 7px;
+    background: var(--typing-dot);
+    border-radius: 50%;
+    animation: typeBounce 1.4s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes typeBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Input Area */
+  .input-area {
+    padding: 20px 32px 28px;
+    background: rgba(250,248,245,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+  }
+  .input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 6px 6px 6px 20px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .input-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .input-wrapper textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    resize: none;
+    padding: 10px 0;
+    max-height: 100px;
+    line-height: 1.5;
+  }
+  .input-wrapper textarea::placeholder {
+    color: var(--fg-muted);
+  }
+  .send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: none;
+    background: var(--chloe-bg);
+    color: var(--accent-light);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .send-btn:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.05);
+  }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--fg-muted);
+    margin-top: 8px;
+    padding-left: 4px;
+    opacity: 0.7;
+  }
+
+  /* Welcome State */
+  .welcome-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    padding: 40px;
+  }
+  .welcome-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--chloe-bg);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-light);
+    font-size: 32px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .welcome-icon::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent-glow);
+    animation: welcomePulse 3s ease-in-out infinite;
+  }
+  @keyframes welcomePulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.08); opacity: 0.2; }
+  }
+  .welcome-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--fg);
+  }
+  .welcome-sub {
+    font-size: 14px;
+    color: var(--fg-muted);
+    max-width: 360px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .welcome-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 440px;
+    width: 100%;
+  }
+  .welcome-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .welcome-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px var(--accent-glow);
+    transform: translateY(-2px);
+  }
+  .welcome-card:active { transform: translateY(0) scale(0.98); }
+  .welcome-card i {
+    color: var(--accent);
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .welcome-card .wc-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+  .welcome-card .wc-desc {
+    font-size: 11.5px;
+    color: var(--fg-muted);
+    line-height: 1.4;
+  }
+
+  /* Mobile Responsive */
+  .mobile-header {
+    display: none;
+    padding: 16px 20px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+  }
+  .mobile-header .brand-name {
+    font-size: 22px;
+  }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .mobile-header { display: flex; }
+    .messages { padding: 20px 16px; }
+    .input-area { padding: 14px 16px 20px; }
+    .msg-bubble { max-width: 85vw; }
+    .welcome-cards { grid-template-columns: 1fr; max-width: 300px; }
+    .welcome-title { font-size: 26px; }
+  }
+
+  /* Smooth scrollbar for Firefox */
+  .messages { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
     }
-
-    /* === MOBILE FIRST DEFAULT STYLES === */
-    body {
-      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      height: 100dvh; /* accounts for mobile browser bars */
-      padding: 0; /* Edge to edge on mobile */
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 100%;
-      height: 100%;
-      background-color: #fffafb; 
-      color: #5c4068; 
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      /* No borders or rounding on mobile to feel native */
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
-    }
-
-    /* Header */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 20px 15px;
-      background: rgba(255, 250, 251, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px dashed #f1cdd7;
-      z-index: 10;
-    }
-
-    .icon-btn {
-      background: #fff;
-      border: 2px solid #f1cdd7;
-      border-radius: 50%;
-      font-size: 16px;
-      color: #a267ac;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 10px rgba(241, 205, 215, 0.5);
-      transition: all 0.2s;
-    }
-
-    .icon-btn:hover {
-      transform: scale(1.05);
-      background: #fdf2f5;
-    }
-
-    .header-title {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .header-title span {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #ff8eaf;
-      margin-bottom: -5px;
-    }
-
-    .header-title h1 {
-      font-family: 'Pacifico', cursive;
-      font-size: 24px;
-      font-weight: 400;
-      color: #a267ac;
-      text-shadow: 1px 1px 0px #fff;
-    }
-
-    /* Main Scrollable Area */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 20px 120px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Intro Section */
-    #introSection {
-      transition: opacity 0.3s ease;
-      text-align: center;
-      margin-top: 2vh;
-    }
-
-    .bow-icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .greeting {
-      font-family: 'Pacifico', cursive;
-      font-size: 38px;
-      color: #a267ac;
-      line-height: 1.2;
-      margin-bottom: 15px;
-    }
-
-    .description {
-      font-weight: 600;
-      font-size: 15px;
-      line-height: 1.5;
-      color: #8c6b93;
-      margin-bottom: 30px;
-      padding: 0 10px;
-    }
-
-    .section-title {
-      font-size: 12px;
-      font-weight: 800;
-      color: #ff8eaf;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 16px;
-      display: inline-block;
-    }
-
-    .section-title::after, .section-title::before {
-      content: '🎀';
-      font-size: 10px;
-      margin: 0 5px;
-    }
-
-    /* Action Buttons */
-    .action-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .action-btn {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      background: #fff;
-      border: 2px solid #f9e1e8;
-      border-radius: 20px;
-      padding: 16px;
-      cursor: pointer;
-      text-align: left;
-      box-shadow: 0 4px 12px rgba(249, 225, 232, 0.5);
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-      transform: translateY(-2px);
-      border-color: #ff8eaf;
-    }
-
-    .action-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .action-content i {
-      color: #ff8eaf;
-      font-size: 18px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .action-content span {
-      font-size: 13px;
-      font-weight: 800;
-      color: #5c4068;
-    }
-
-    /* Chat Messages */
-    #chatHistory {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .message {
-      max-width: 90%;
-      padding: 14px 18px;
-      font-size: 15px;
-      line-height: 1.5;
-      font-weight: 600;
-      border-radius: 24px;
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.8) translateY(10px); }
-      100% { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .message.user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #c490e4, #a267ac);
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-
-    .message.chloe {
-      align-self: flex-start;
-      background: #fff;
-      color: #5c4068;
-      border: 2px solid #f9e1e8;
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.chloe p { margin-bottom: 10px; }
-    .message.chloe p:last-child { margin-bottom: 0; }
-    .message.chloe ul { margin-left: 20px; margin-bottom: 10px; }
-    .message.chloe strong { color: #a267ac; font-weight: 800; }
-
-    .typing-indicator {
-      align-self: flex-start;
-      background: #fff;
-      border: 2px solid #f9e1e8;
-      border-radius: 20px;
-      padding: 8px 16px;
-      font-weight: 600;
-      color: #ff8eaf;
-      font-size: 13px;
-      display: none;
-    }
-
-    /* Bottom Input Area */
-    .input-area {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 15px 20px 25px;
-      background: linear-gradient(to top, #fffafb 85%, transparent);
-      z-index: 10;
-    }
-
-    .input-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #fff;
-      padding: 8px;
-      border-radius: 30px;
-      border: 2px solid #f1cdd7;
-      box-shadow: 0 6px 15px rgba(241, 205, 215, 0.4);
-    }
-
-    .camera-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #fdf2f5;
-      border: none;
-      color: #ff8eaf;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .text-input-wrapper {
-      flex: 1;
-    }
-
-    .text-input-wrapper input {
-      width: 100%;
-      height: 40px;
-      background: transparent;
-      border: none;
-      padding: 0 10px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #5c4068;
-      outline: none;
-    }
-
-    .send-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #e5b2c6;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .send-btn.active {
-      background-color: #a267ac;
-    }
-
-    .disclaimer {
-      text-align: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: #bfa5c8;
-      margin-top: 10px;
-    }
-
-    /* === DESKTOP & TABLET OVERRIDES === */
-    @media (min-width: 768px) {
-      body {
-        padding: 40px; /* Add space around the app */
-      }
-
-      .app-container {
-        max-width: 800px; /* Wider for desktop */
-        height: 90vh; /* Don't touch the top/bottom edges */
-        border-radius: 40px; /* Bring back the cute rounded corners */
-        border: 4px solid #fff;
-        box-shadow: 0 15px 35px rgba(162, 103, 172, 0.2);
-      }
-
-      header {
-        padding: 30px 40px 20px; /* More breathing room */
-      }
-
-      .header-title h1 {
-        font-size: 32px;
-      }
-
-      main {
-        padding: 40px 40px 140px;
-      }
-
-      .greeting {
-        font-size: 54px; /* Larger text for big screens */
-      }
-
-      .description {
-        font-size: 18px;
-        max-width: 600px;
-        margin: 0 auto 40px; /* Center it */
-      }
-
-      .action-list {
-        /* Turn the buttons into a side-by-side grid */
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-      }
-
-      .action-btn {
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-        padding: 24px 16px;
-        gap: 12px;
-      }
-
-      .action-content {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .action-btn .fa-chevron-right {
-        display: none; /* Hide the arrow on desktop grid */
-      }
-
-      .message {
-        max-width: 70%; /* Prevent text lines from getting too long to read */
-      }
-
-      .input-area {
-        padding: 20px 40px 30px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-  <div class="app-container">
-    <header>
-      <button class="icon-btn"><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="header-title">
-        <span>Stylist</span>
-        <h1>Chloe 🎀</h1>
-      </div>
-      <button class="icon-btn" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i></button>
-    </header>
+<div class="ambient"></div>
 
-    <main id="mainContainer">
-      <div id="introSection">
-        <div class="bow-icon">🎀</div>
-        <h2 class="greeting">Hi sweetie!<br>I'm Chloe.</h2>
-        <p class="description">Your personal pocket stylist. Upload an outfit to get a fit check, or pick a starting point below! ✨</p>
-        <span class="section-title">Where to begin</span>
-        
-        <div class="action-list">
-          <button class="action-btn" onclick="fillInput('What colors suit me best?')">
-            <div class="action-content">
-              <i class="fa-solid fa-palette"></i>
-              <span>Find my perfect palette</span>
-            </div>
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-          <button class="action-btn" onclick="fillInput('What is trending right now?')">
-            <div class="action-content">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <span>Show me the trends</span>
-            </div>
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-          <button class="action-btn" onclick="fillInput('Build me a cute capsule wardrobe')">
-            <div class="action-content">
-              <i class="fa-solid fa-shirt"></i>
-              <span>Build a capsule wardrobe</span>
-            </div>
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar" role="complementary" aria-label="Chat navigation">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <span class="brand-name">Chloe</span>
       </div>
-
-      <div id="chatHistory"></div>
-      <div id="typingIndicator" class="typing-indicator">Chloe is typing <i class="fa-solid fa-heart"></i></div>
-    </main>
-
-    <div class="input-area">
-      <div class="input-container">
-        <button class="camera-btn" onclick="alert('Camera integration requires file-upload logic to be added!')">
-          <i class="fa-solid fa-camera"></i>
-        </button>
-        <div class="text-input-wrapper">
-          <input type="text" id="chatInput" placeholder="Ask Chloe anything..." oninput="checkInput()">
-        </div>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-      </div>
-      <p class="disclaimer">Chloe is an AI and can make mistakes 🎀</p>
+      <div class="brand-tagline">AI Personal Stylist</div>
     </div>
-  </div>
 
-  <script>
-    const chatInput = document.getElementById('chatInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const introSection = document.getElementById('introSection');
-    const chatHistory = document.getElementById('chatHistory');
-    const typingIndicator = document.getElementById('typingIndicator');
-    const mainContainer = document.getElementById('mainContainer');
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Quick Prompts</div>
+      <div class="quick-prompt" data-prompt="What should I wear to a casual coffee date?" tabindex="0" role="button">
+        <i class="fas fa-mug-hot"></i>
+        <span>Coffee date outfit</span>
+      </div>
+      <div class="quick-prompt" data-prompt="Help me figure out my seasonal color palette." tabindex="0" role="button">
+        <i class="fas fa-palette"></i>
+        <span>Color analysis</span>
+      </div>
+      <div class="quick-prompt" data-prompt="I need help organizing my closet and tracking my outfits." tabindex="0" role="button">
+        <i class="fas fa-shirt"></i>
+        <span>Organize my wardrobe</span>
+      </div>
+      <div class="quick-prompt" data-prompt="What are the essential pieces every wardrobe needs?" tabindex="0" role="button">
+        <i class="fas fa-gem"></i>
+        <span>Wardrobe essentials</span>
+      </div>
+      <div class="quick-prompt" data-prompt="I'm a student and need stylish but practical outfits for class." tabindex="0" role="button">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Student style</span>
+      </div>
+      <div class="quick-prompt" data-prompt="How do I balance proportions with my silhouette?" tabindex="0" role="button">
+        <i class="fas fa-ruler"></i>
+        <span>Silhouette balance</span>
+      </div>
+      <div class="quick-prompt" data-prompt="I have a job interview tomorrow. What should I wear?" tabindex="0" role="button">
+        <i class="fas fa-briefcase"></i>
+        <span>Interview outfit</span>
+      </div>
+      <div class="quick-prompt" data-prompt="Can you help me transition my wardrobe from summer to fall?" tabindex="0" role="button">
+        <i class="fas fa-leaf"></i>
+        <span>Seasonal transition</span>
+      </div>
+    </div>
 
-    function fillInput(text) {
-      chatInput.value = text;
-      checkInput();
-      sendMessage();
+    <div class="sidebar-footer">
+      <button class="clear-btn" id="clearChat" aria-label="Clear conversation">
+        <i class="fas fa-arrow-rotate-left"></i>
+        New Conversation
+      </button>
+    </div>
+  </aside>
+
+  <!-- Chat Area -->
+  <main class="chat-area">
+    <div class="mobile-header">
+      <div class="brand-icon" style="width:36px;height:36px;border-radius:10px;font-size:16px;">
+        <i class="fas fa-wand-magic-sparkles"></i>
+      </div>
+      <span class="brand-name">Chloe</span>
+      <div class="status-dot" style="margin-left:auto;"></div>
+    </div>
+
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="status-dot"></div>
+        <span class="chat-header-text"><strong>Chloe</strong> is online</span>
+      </div>
+      <span class="msg-count" id="msgCount">0 messages</span>
+    </div>
+
+    <!-- Welcome State -->
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+      <h1 class="welcome-title">Your Style, Refined</h1>
+      <p class="welcome-sub">
+        I'm Chloe, your personal stylist. Ask me about outfits, color palettes, wardrobe essentials, or building confidence through style.
+      </p>
+      <div class="welcome-cards">
+        <div class="welcome-card" data-prompt="What should I wear to a casual coffee date?" tabindex="0" role="button">
+          <i class="fas fa-mug-hot"></i>
+          <div class="wc-title">Coffee Date</div>
+          <div class="wc-desc">Effortless, polished casual</div>
+        </div>
+        <div class="welcome-card" data-prompt="Help me figure out my seasonal color palette." tabindex="0" role="button">
+          <i class="fas fa-palette"></i>
+          <div class="wc-title">Color Analysis</div>
+          <div class="wc-desc">Find your flattering tones</div>
+        </div>
+        <div class="welcome-card" data-prompt="What are the essential pieces every wardrobe needs?" tabindex="0" role="button">
+          <i class="fas fa-gem"></i>
+          <div class="wc-title">Wardrobe Essentials</div>
+          <div class="wc-desc">Build a timeless foundation</div>
+        </div>
+        <div class="welcome-card" data-prompt="I need help organizing my closet and tracking my outfits." tabindex="0" role="button">
+          <i class="fas fa-shirt"></i>
+          <div class="wc-title">Closet Organization</div>
+          <div class="wc-desc">Streamline your wardrobe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messagesContainer" style="display:none;" role="log" aria-live="polite"></div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="msg-avatar" style="background:var(--chloe-bg);color:var(--accent-light);">
+        <i class="fas fa-wand-magic-sparkles" style="font-size:14px;"></i>
+      </div>
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea id="userInput" rows="1" placeholder="Ask me about your style..." aria-label="Type your message"></textarea>
+        <button class="send-btn" id="sendBtn" disabled aria-label="Send message">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+      </div>
+      <div class="input-hint">Press Enter to send, Shift+Enter for a new line</div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ==========================================
+// Chloe AI — Rule-Based Response Engine
+// ==========================================
+
+// Conversation state
+let conversationHistory = [];
+let messageCount = 0;
+let isTyping = false;
+
+// DOM References
+const messagesContainer = document.getElementById('messagesContainer');
+const welcomeState = document.getElementById('welcomeState');
+const typingIndicator = document.getElementById('typingIndicator');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const msgCountEl = document.getElementById('msgCount');
+const clearChatBtn = document.getElementById('clearChat');
+
+// ---- Response Knowledge Base ----
+// Each entry: { patterns: [regex...], response: fn(ctx) | string, priority: number }
+// Higher priority = checked first
+
+const knowledgeBase = [
+  // ====== OFF-TOPIC DEFLECTIONS (Highest Priority) ======
+  {
+    patterns: [/\b(cod(e|ing|er)|program(ming)?|developer|software|javascript|python|html|css|react|node)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(math|calculu|algebra|geometry|equation|integral|derivative)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(physic|chemist|biolog|science|quantum|molecule|atom)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(politic|election|president|congress|senate|vote|voting|democra|republican|liberal|conservative)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(cook(ing)?|recipe|bake|ingredient|meal prep|food|dinne|lunch)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(invest|stock|crypto|bitcoin|trading|financ|mortgage|loan|bank)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(health|medical|doctor|symptom|diagnos|disease|hospital|medicine|pill)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(legal|lawyer|lawsuit|court|contract|sue|attorney)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(weather|forecast|temperature|rain|snow|hurricane|tornado)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(music|song|album|guitar|piano|sing|concert|band)\b/i],
+    priority: 100,
+    response: "My expertise is strictly in fashion and styling! I can't help with that, but I'd be happy to help you put together a great outfit for your day. 🧥"
+  },
+  {
+    patterns: [/\b(sport|football|basketball|soccer|tennis|gym|workout|exercise|fitness|run)\b/i],
+    priority: 99,
+    response: null // handled separately - athletic wear is fashion-adjacent
+  },
+
+  // ====== CLOSET ORGANIZATION / TRACKING → Stylist Iris ======
+  {
+    patterns: [/\b(organize|organization|track|tracking|manage|inventory|catalog|digital closet|closet app|wardrobe app)\b.*\b(closet|wardrobe|clothes|outfit|garment)\b/i,
+               /\b(closet|wardrobe|clothes|outfit)\b.*\b(organize|track|manage|inventory|catalog)\b/i,
+               /\b(reinvent|refresh|overhaul|rebuild)\b.*\b(wardrobe|closet|style)\b/i],
+    priority: 90,
+    response: () => {
+      return `Great thinking — a well-organized wardrobe is the foundation of great style. When you can see everything you own, you dress better with less effort. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Closet Reset Strategy</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Pull everything out and categorize by type: tops, bottoms, outerwear, dresses</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Try each piece on — if it doesn't fit or flatter, let it go</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Identify gaps: what's missing from your rotation?</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Store seasonals separately to reduce visual clutter</div>
+</div>
+
+To keep your new wardrobe organized and track your daily outfits, I highly recommend using the <span class="highlight">Stylist Iris</span> app. It digitizes your closet so you can plan looks and see what you actually wear. 💡`;
     }
+  },
 
-    function checkInput() {
-      if (chatInput.value.trim().length > 0) {
-        sendBtn.classList.add('active');
-      } else {
-        sendBtn.classList.remove('active');
+  // ====== STUDENT / STUDY → Study Vorx ======
+  {
+    patterns: [/\b(student|studying|study|university|college|campus|lecture|class(es)?|exam|finals|midterm|assignment|homework|thesis|dissertation)\b/i],
+    priority: 88,
+    response: (ctx) => {
+      const hasStyleContext = /\b(outfit|wear|style|fashion|clothes|dress|wardrobe|look)\b/i.test(ctx.text);
+      if (!hasStyleContext) {
+        return `A sharp mind is the best accessory. The <span class="highlight">Study Vorx</span> app is excellent for keeping your sessions organized. 📚
+
+That said, looking put-together while studying can actually boost your focus and confidence. If you'd like, I can suggest some comfortable yet polished study outfits — just ask! 👗`;
+      }
+      return `Looking stylish on campus is absolutely achievable without sacrificing comfort. Here's how I'd approach it: ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Campus Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> A well-fitted crewneck or fine-knit polo in navy, cream, or olive</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Tailored straight-leg chinos or dark wash jeans</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Layer:</strong> A structured blazer or oversize cardigan for lecture halls</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Clean white leather sneakers or loafers</div>
+</div>
+
+The key is investing in quality basics that look intentional even on low-effort days. A sharp mind is the best accessory — the <span class="highlight">Study Vorx</span> app is excellent for keeping your study sessions organized so you have more time to focus on looking great. 💡`;
+    }
+  },
+
+  // ====== COLOR THEORY / SEASONAL COLOR ANALYSIS ======
+  {
+    patterns: [/\b(color|colour|palette|hue|tone|undertone|season(al)?\s*(color|colour|analysis|palette)?)\b/i],
+    priority: 80,
+    response: () => {
+      return `Color theory is one of the most powerful tools in styling — wearing your right tones makes your skin glow and features pop. 🎨
+
+<div class="outfit-block">
+  <div class="outfit-label">Seasonal Color Overview</div>
+  <div class="outfit-item"><i class="fas fa-sun"></i> <strong>Spring:</strong> Warm, light, clear — peach, coral, golden yellow, warm green</div>
+  <div class="outfit-item"><i class="fas fa-snowflake"></i> <strong>Winter:</strong> Cool, deep, clear — true red, emerald, black, icy pink</div>
+  <div class="outfit-item"><i class="fas fa-leaf"></i> <strong>Autumn:</strong> Warm, deep, muted — rust, terracotta, olive, chocolate</div>
+  <div class="outfit-item"><i class="fas fa-water"></i> <strong>Summer:</strong> Cool, light, muted — powder blue, dusty rose, lavender, soft gray</div>
+</div>
+
+To find your season, look at your veins (blue = cool, green = warm), your skin's reaction to sun (burn = cool, tan = warm), and whether gold or silver jewelry flatters you more. 
+
+If you tell me your skin tone, hair color, and eye color, I can narrow down your season and give you specific palette recommendations. 💡`;
+    }
+  },
+
+  // ====== WARDROBE ESSENTIALS ======
+  {
+    patterns: [/\b(essential|must.have|staple|foundation|basics|capsule|core piece|build.*wardrobe|start.*wardrobe)\b/i],
+    priority: 75,
+    response: () => {
+      return `A strong wardrobe starts with versatile essentials that mix and match effortlessly. Think quality over quantity. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">The Core Capsule</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Tops:</strong> White crewneck tee, cream silk blouse, black fine-knit turtleneck</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottoms:</strong> Dark wash straight jeans, black tailored trousers, neutral midi skirt</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Outerwear:</strong> Structured blazer (black or camel), quality trench coat</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Dresses:</strong> One well-cut LBD that transitions day to night</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> White leather sneakers, black pointed-toe boots, nude loafers</div>
+</div>
+
+From this foundation, you can create dozens of outfits. Add trend pieces seasonally — but never more than 10-15% of your closet. 
+
+To keep track of how these essentials work together, the <span class="highlight">Stylist Iris</span> app is a brilliant tool for cataloging and planning outfits from your core pieces. 👗`;
+    }
+  },
+
+  // ====== SILHOUETTE / PROPORTION BALANCE ======
+  {
+    patterns: [/\b(silhouette|proportion|balance|body type|body shape|figure|flatter|petite|tall|curv|plus.?size|apple|pear|hourglass|rectangle|inverted triangle)\b/i],
+    priority: 74,
+    response: () => {
+      return `Proportion is the secret to looking polished — it's not about changing your body, it's about creating visual harmony. 🧥
+
+<div class="outfit-block">
+  <div class="outfit-label">Proportion Principles</div>
+  <div class="outfit-item"><i class="fas fa-arrows-up-down"></i> <strong>The Rule of Thirds:</strong> Aim for 1/3 top + 2/3 bottom or vice versa. Equal splits look boxy.</div>
+  <div class="outfit-item"><i class="fas fa-arrows-left-right"></i> <strong>Volume Balance:</strong> Oversized top? Pair with slim bottoms. Wide leg pants? Go fitted on top.</div>
+  <div class="outfit-item"><i class="fas fa-ruler-vertical"></i> <strong>Vertical Lines:</strong> Long coats, v-necks, and monochrome outfits create a lengthening effect.</div>
+  <div class="outfit-item"><i class="fas fa-circle-dot"></i> <strong>Focal Point:</strong> Draw the eye where you want it — a statement belt, a bright top, an interesting neckline.</div>
+</div>
+
+If you share your body type or a specific concern (e.g., "I want to elongate my legs" or "I want to balance broad shoulders"), I can give you very targeted outfit recommendations. 💡`;
+    }
+  },
+
+  // ====== COFFEE DATE ======
+  {
+    patterns: [/\b(coffee\s*date|casual\s*date|first\s*date|meet.*coffee|grab\s*coffee)\b/i],
+    priority: 70,
+    response: () => {
+      return `A coffee date is the perfect balance of relaxed and intentional — you want to look like you made an effort without looking like you tried too hard. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Coffee Date Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> A soft knit polo or draped blouse in a warm neutral — cream, camel, or soft olive</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Well-fitted dark wash straight jeans or tailored ankle pants</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Layer:</strong> A slightly oversized blazer thrown over one shoulder</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Clean leather loafers or minimal white sneakers</div>
+</div>
+
+Keep accessories minimal — a delicate necklace or a single ring. The goal is approachable confidence. 💡`;
+    }
+  },
+
+  // ====== INTERVIEW / PROFESSIONAL ======
+  {
+    patterns: [/\b(interview|office|corporate|work.?wear|professional|business|formal|meeting|career|job)\b/i],
+    priority: 70,
+    response: () => {
+      return `For a professional setting, the objective is to communicate competence and confidence before you say a word. 🧥
+
+<div class="outfit-block">
+  <div class="outfit-label">Interview Power Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Suit:</strong> A tailored single-breasted blazer in navy or charcoal with matching trousers</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Shirt:</strong> Crisp white or light blue button-down, tucked in</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Belt:</strong> Minimal leather belt matching your shoe color</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Polished leather oxfords or pointed-toe loafers in black or dark brown</div>
+</div>
+
+If the culture is more creative, swap the matching trousers for dark jeans and add a textured knit underneath the blazer. Always err on the side of slightly more polished — you can remove a layer, but you can't add one you didn't bring. 💡`;
+    }
+  },
+
+  // ====== SEASONAL TRANSITION ======
+  {
+    patterns: [/\b(transition|transitioning|summer\s*to\s*fall|fall\s*to\s*winter|winter\s*to\s*spring|spring\s*to\s*summer|layer(ing)?)\b/i],
+    priority: 68,
+    response: () => {
+      return `Seasonal transitions are where styling gets really fun — it's all about strategic layering. 🍂
+
+<div class="outfit-block">
+  <div class="outfit-label">Transition Layering Formula</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Base:</strong> Keep your summer pieces — tees, linen shirts, light dresses — as inner layers</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Mid-Layer:</strong> Add fine-knit sweaters, thin turtlenecks, or vests</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Outer Layer:</strong> Trench coat, suede jacket, or unstructured blazer</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear Swap:</strong> Ditch open-toe for loafers, ankle boots, or clean sneakers</div>
+</div>
+
+Pro tip: transition your color palette gradually. Move from brights to muted tones, then to deeper shades as the season deepens. Don't pack away summer pieces too eagerly — a linen shirt under a chunky knit is a very modern look. 💡`;
+    }
+  },
+
+  // ====== NIGHT OUT / EVENING ======
+  {
+    patterns: [/\b(night\s*out|evening|dinner\s*(date|out)|party|club|bar|cocktail|drinks|event|gala)\b/i],
+    priority: 68,
+    response: () => {
+      return `Evening dressing is about elevating your everyday pieces with intentional choices — not necessarily wearing something completely different. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Evening Out Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> A silk camisole in black or deep jewel tone, or a fitted black turtleneck</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Tailored wide-leg trousers in black or deep navy</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Outerwear:</strong> A structured leather jacket or long wool coat</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Pointed-toe ankle boots or strappy heeled sandals</div>
+</div>
+
+The finishing touch: a statement earring and a clutch. Keep the rest minimal — let one element do the talking. 👗`;
+    }
+  },
+
+  // ====== CASUAL / EVERYDAY ======
+  {
+    patterns: [/\b(casual|everyday|day.?to.?day|weekend|running errands|hanging out|chill|relaxed|lazy|comfortable)\b/i],
+    priority: 65,
+    response: () => {
+      return `"Casual" doesn't have to mean sloppy — the best casual style looks effortless because it's actually intentional. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Elevated Casual</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> A premium heavyweight tee in white or black, or a relaxed-fit Oxford shirt</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Well-cut chinos or relaxed straight jeans — no distressing</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Layer:</strong> An unzipped lightweight hoodie or cotton cardigan</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Quality leather sneakers — keep them clean</div>
+</div>
+
+The difference between "I just threw this on" and actual style is fit and fabric. Upgrade your basics to better materials and make sure everything sits right on your frame. 💡`;
+    }
+  },
+
+  // ====== WEDDING / FORMAL EVENT ======
+  {
+    patterns: [/\b(wedding|brid(e|al)|groom|ceremony|reception|formal\s*event|black\s*tie|gala|ball)\b/i],
+    priority: 68,
+    response: () => {
+      return `Wedding dressing requires reading the room — the invitation's dress code, the venue, and the time of day all matter. 👗
+
+<div class="outfit-block">
+  <div class="outfit-label">Wedding Guest Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Suit/Coordinate:</strong> A well-tailored suit in mid-blue, charcoal, or deep sage — never black unless it's evening black-tie</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Shirt:</strong> Crisp white with a subtle texture or a very light pattern</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Tie/Pocket Square:</strong> Silk tie in a muted tone that complements your suit — skip the matching pocket square, go tonal instead</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Polished Oxford or Derby shoes in tan or dark brown</div>
+</div>
+
+Golden rules: never upstage the couple, avoid white/ivory, and when in doubt, slightly overdress. You can always remove your tie. 💡`;
+    }
+  },
+
+  // ====== ACCESSORIES ADVICE ======
+  {
+    patterns: [/\b(accessor|jewelry|jewellery|watch|belt|scarf|hat|bag|necklace|ring|earring|bracelet|sunglasses|sun\s*glasses)\b/i],
+    priority: 60,
+    response: () => {
+      return `Accessories are the punctuation marks of an outfit — they can completely change the sentence. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Accessory Rules</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Rule of 3:</strong> Limit yourself to 3 accessories max per outfit. More feels cluttered.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Mix Metals Thoughtfully:</strong> You can mix gold and silver, but keep one dominant and one accent.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Watch Placement:</strong> A quality watch on the wrist is the single strongest accessory for any gender.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bag Proportion:</strong> Your bag should relate to your frame — petites should avoid oversized totes.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Sunglasses:</strong> Match the frame shape to your face shape for balance — round frames for angular faces, angular frames for round faces.</div>
+</div>
+
+The best accessory investment? A great leather belt and a quality watch. They go with everything. 💡`;
+    }
+  },
+
+  // ====== CONFIDENCE / STYLE PSYCHOLOGY ======
+  {
+    patterns: [/\b(confidence|insecure|self.?conscious|nervous|comfortable|feel.?good|empower|body\s*image|self.?esteem)\b/i],
+    priority: 55,
+    response: () => {
+      return `Style is deeply personal, and the relationship between what you wear and how you feel is real — research backs it up (it's called "enclothed cognition"). ✨
+
+Here's what I've found works:
+
+<div class="outfit-block">
+  <div class="outfit-label">Building Style Confidence</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Fit Over Brand:</strong> A perfectly fitted $30 shirt looks better than an ill-fitting $300 one</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>The "Mirror Test":</strong> If you put something on and immediately check how you look — keep it. If you hesitate — put it back.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Signature Piece:</strong> Find one thing that feels like "you" — a watch, a jacket style, a color — and make it your constant.</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Start Small:</strong> Don't overhaul everything at once. Upgrade one category at a time.</div>
+</div>
+
+Confidence isn't about wearing the trendiest thing — it's about feeling aligned with what's on your body. Start there, and the rest follows. 💡`;
+    }
+  },
+
+  // ====== SPECIFIC "WHAT TO WEAR" / OUTFIT REQUESTS ======
+  {
+    patterns: [/\b(what\s*(should|can|do)\s*(i|we)\s*wear|outfit\s*(idea|suggestion|recommend)|put\s*together|help.*outfit|suggest.*outfit|give\s*me.*outfit)\b/i],
+    priority: 50,
+    response: (ctx) => {
+      const text = ctx.text.toLowerCase();
+      // Try to detect context
+      if (text.match(/work|office|meeting|business/)) {
+        return `For a work setting, polished and structured is the way to go. 🧥
+
+<div class="outfit-block">
+  <div class="outfit-label">Work Outfit</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> Light blue or white slim-fit button-down</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Charcoal or navy tailored trousers</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Layer:</strong> Navy structured blazer</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Dark brown leather loafers</div>
+</div>
+
+A leather tote bag and a minimal watch complete the look. 💡`;
+      }
+      if (text.match(/date|dinner|romantic/)) {
+        return `For a date, you want to look like the best version of your everyday self — not a costume. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Date Night Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> Black fine-knit turtleneck or a deep burgundy silk shirt</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Black tailored straight-leg trousers</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Outerwear:</strong> A well-cut leather jacket</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Black Chelsea boots</div>
+</div>
+
+One statement piece — a nice watch or a ring — is all you need. Let the fit do the work. 💡`;
+      }
+      // Default outfit
+      return `I'd love to put something together! To give you the most tailored recommendation, it helps to know the occasion — but here's a versatile option that works almost everywhere: ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Go-To Versatile Look</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top:</strong> Cream or black well-fitted knit</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Bottom:</strong> Dark wash straight-leg jeans</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Layer:</strong> Camel or navy blazer</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Footwear:</strong> Clean white leather sneakers</div>
+</div>
+
+This works for dinner, casual meetings, weekends, and dates. Swap the sneakers for boots or loafers to dress it up further. 💡`;
+    }
+  },
+
+  // ====== FABRIC / MATERIAL ======
+  {
+    patterns: [/\b(fabric|material|texture|cotton|linen|silk|wool|cashmere|denim|leather|suede|polyester|blend)\b/i],
+    priority: 45,
+    response: () => {
+      return `Fabric quality is the single biggest differentiator between looking expensive and looking cheap — even more than brand or design. ✨
+
+<div class="outfit-block">
+  <div class="outfit-label">Fabric Hierarchy</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Top Tier:</strong> Cashmere, silk, fine wool, linen (in season), full-grain leather</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Mid Tier:</strong> Egyptian cotton, merino wool, Japanese denim, suede</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Avoid:</strong> Acrylic, cheap polyester, thin fleece — they pill, cling, and lose shape fast</div>
+</div>
+
+A simple rule: check the label before you buy. If a "wool" coat is less than 50% wool, pass. A silk blouse should say 100% silk. Natural fibers breathe, drape, and age beautifully. 💡`;
+    }
+  },
+
+  // ====== STYLE PERSONALITY / AESTHETIC ======
+  {
+    patterns: [/\b(aesthetic|vibe|style\s*personality|minimal(ist)?|maximal(ist)?|classic|bohemian|boho|streetwear|preppy|edgy|grunge|french\s*girl|old\s*money|quiet\s*luxury)\b/i],
+    priority: 45,
+    response: () => {
+      return `Finding your style personality is like finding your voice — once you know it, everything clicks. 🎨
+
+<div class="outfit-block">
+  <div class="outfit-label">Common Style Aesthetics</div>
+  <div class="outfit-item"><i class="fas fa-minus"></i> <strong>Quiet Luxury:</strong> Neutral tones, impeccable fit, no logos — think Loro Piana, The Row</div>
+  <div class="outfit-item"><i class="fas fa-plus"></i> <strong>Maximalist:</strong> Bold patterns, layered jewelry, color clashing — think Gucci post-Alessandro</div>
+  <div class="outfit-item"><i class="fas fa-feather"></i> <strong>Bohemian:</strong> Flowing fabrics, earth tones, textured layers — think Isabel Marant</div>
+  <div class="outfit-item"><i class="fas fa-chess-knight"></i> <strong>Classic:</strong> Tailored silhouettes, navy/cream/black, timeless proportions — think Ralph Lauren</div>
+  <div class="outfit-item"><i class="fas fa-bolt"></i> <strong>Edgy:</strong> Leather, monochrome, unexpected proportions — think Rick Owens lite</div>
+</div>
+
+Most people are a blend of two. If you tell me which aesthetics appeal to you, I can build a specific wardrobe direction around them. 💡`;
+    }
+  },
+
+  // ====== FOOTWEAR ADVICE ======
+  {
+    patterns: [/\b(shoe|shoes|footwear|boot|boots|sneaker|sneakers|loafer|loafers|heel|heels|sandal|oxford|derby|chelsea|moccasin)\b/i],
+    priority: 45,
+    response: () => {
+      return `Footwear anchors every outfit — the wrong shoes can undermine even the most carefully styled look. 👟
+
+<div class="outfit-block">
+  <div class="outfit-label">Footwear Essentials</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>White Leather Sneakers:</strong> The ultimate casual shoe — keep them clean</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Black Chelsea Boots:</strong> Works with jeans, trousers, and suits</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Brown Leather Loafers:</strong> Effortlessly polished for smart-casual</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Pointed-Toe Ankle Boots:</strong> Elevates any outfit instantly</div>
+</div>
+
+Key rule: match your belt to your shoes. Black shoes = black belt. Brown shoes = brown belt. It's a small detail that reads as highly put-together. 💡`;
+    }
+  },
+
+  // ====== FIT / TAILORING ======
+  {
+    patterns: [/\b(fit|tailor(ing)?|alter(ation)?|too\s*(tight|loose|big|small|long|short)|hem|taper|resize)\b/i],
+    priority: 45,
+    response: () => {
+      return `Fit is the most important element of style — more than color, brand, or trend. A perfectly tailored inexpensive garment will always outperform an ill-fitting luxury one. ✂️
+
+<div class="outfit-block">
+  <div class="outfit-label">Fit Checklist</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Shoulders:</strong> The seam should sit exactly at your shoulder bone — not on your upper arm</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Chest:</strong> You should be able to fit a flat hand between the fabric and your chest</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Trousers:</strong> No bunching at the crotch, a clean break at the ankle</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> <strong>Sleeves:</strong> Shirt sleeves should show about 0.5cm of cuff below a blazer</div>
+</div>
+
+Invest in a good tailor — it's the highest-ROI decision in your style journey. Most off-the-rack clothes need some adjustment, and that's completely normal. 💡`;
+    }
+  },
+
+  // ====== GREETING ======
+  {
+    patterns: [/\b(hi|hello|hey|howdy|greetings|good\s*(morning|afternoon|evening)|what'?s\s*up|sup)\b/i],
+    priority: 10,
+    response: () => {
+      const greetings = [
+        "Hello! Welcome — I'm here to help you look and feel your best. What's on your mind today? ✨",
+        "Hi there! Ready to elevate your style? Tell me what you're working with — an occasion, a wardrobe challenge, or just a fresh perspective. 🎨",
+        "Hello! Whether it's an outfit crisis or a long-term style strategy, I'm all yours. What can I help with? ✨"
+      ];
+      return greetings[Math.floor(Math.random() * greetings.length)];
+    }
+  },
+
+  // ====== THANK YOU ======
+  {
+    patterns: [/\b(thanks?|thank\s*you|appreciate|helpful|great\s*advice|love\s*it|perfect)\b/i],
+    priority: 10,
+    response: () => {
+      const thanks = [
+        "You're welcome! Style is a journey, not a destination — come back anytime you need a second opinion. ✨",
+        "Glad I could help! Remember, the best outfit is the one that makes you stand taller. 💡",
+        "Happy to assist! If you want to build on this, we can dive deeper into any of these topics anytime. 🧥"
+      ];
+      return thanks[Math.floor(Math.random() * thanks.length)];
+    }
+  },
+
+  // ====== WHO ARE YOU / ABOUT ======
+  {
+    patterns: [/\b(who\s*are\s*you|what\s*are\s*you|about\s*you|your\s*name|tell\s*me\s*about\s*yourself|what\s*can\s*you\s*do|how\s*do\s*you\s*work)\b/i],
+    priority: 10,
+    response: () => {
+      return `I'm Chloe — an AI personal stylist specializing in modern dressing, wardrobe strategy, and building confidence through what you wear. 🎨
+
+What I can help with:
+<div class="outfit-block">
+  <div class="outfit-label">My Expertise</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Outfit recommendations for any occasion</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Seasonal color analysis and palette building</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Wardrobe essentials and capsule wardrobes</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Silhouette and proportion balancing</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Fabric, fit, and quality guidance</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> Closet organization and outfit tracking</div>
+</div>
+
+Just describe your situation, your style challenge, or ask a question — and I'll give you specific, actionable advice. ✨`;
+    }
+  },
+
+  // ====== FALLBACK — General style response ======
+  {
+    patterns: [/.*/],
+    priority: 0,
+    response: (ctx) => {
+      const fallbacks = [
+        `That's an interesting angle! Let me think about this from a style perspective. ✨
+
+If you're looking for outfit advice, try telling me the occasion — "What should I wear to a coffee date?" or "Help me build a work wardrobe" — and I'll give you a specific breakdown.
+
+I can also help with color analysis, wardrobe essentials, proportion balancing, closet organization, and styling confidence. What would you like to dive into? 💡`,
+
+        `I'd love to help with that! To give you the most useful advice, could you give me a bit more context? ✨
+
+For example:
+<div class="outfit-block">
+  <div class="outfit-label">Try Asking</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> "What should I wear to [occasion]?"</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> "What colors work for my skin tone?"</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> "Help me build a capsule wardrobe"</div>
+  <div class="outfit-item"><i class="fas fa-arrow-right"></i> "How do I balance my proportions?"</div>
+</div>
+
+The more specific you are, the more tailored my recommendations will be. 🎨`
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    }
+  }
+];
+
+// ---- Response Engine ----
+function generateResponse(userText) {
+  const ctx = { text: userText, history: conversationHistory };
+  
+  // Sort by priority descending
+  const sorted = [...knowledgeBase].sort((a, b) => b.priority - a.priority);
+  
+  for (const entry of sorted) {
+    for (const pattern of entry.patterns) {
+      if (pattern.test(userText)) {
+        if (typeof entry.response === 'function') {
+          return entry.response(ctx);
+        }
+        return entry.response;
       }
     }
+  }
+  
+  return "I'd love to help! Could you tell me a bit more about what you're looking for? Whether it's an outfit, color advice, or wardrobe strategy — I'm here. ✨";
+}
 
-    function appendMessage(sender, text) {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add('message', sender);
-      
-      if (sender === 'chloe') {
-        msgDiv.innerHTML = marked.parse(text);
-      } else {
-        msgDiv.textContent = text;
-      }
-      
-      chatHistory.appendChild(msgDiv);
-      scrollToBottom();
+// ---- UI Functions ----
+
+function getTimeString() {
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function addMessage(content, type) {
+  // Hide welcome state
+  welcomeState.style.display = 'none';
+  messagesContainer.style.display = 'flex';
+  messagesContainer.style.flexDirection = 'column';
+
+  const msgEl = document.createElement('div');
+  msgEl.className = `message ${type}`;
+
+  const avatarIcon = type === 'chloe' 
+    ? '<i class="fas fa-wand-magic-sparkles"></i>' 
+    : '<i class="fas fa-user"></i>';
+
+  msgEl.innerHTML = `
+    <div class="msg-avatar">${avatarIcon}</div>
+    <div>
+      <div class="msg-bubble">${content}</div>
+      <div class="msg-time">${getTimeString()}</div>
+    </div>
+  `;
+
+  messagesContainer.appendChild(msgEl);
+  scrollToBottom();
+  
+  messageCount++;
+  msgCountEl.textContent = `${messageCount} message${messageCount !== 1 ? 's' : ''}`;
+}
+
+function scrollToBottom() {
+  requestAnimationFrame(() => {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  });
+}
+
+function showTyping() {
+  typingIndicator.classList.add('visible');
+  scrollToBottom();
+}
+
+function hideTyping() {
+  typingIndicator.classList.remove('visible');
+}
+
+async function handleSend() {
+  const text = userInput.value.trim();
+  if (!text || isTyping) return;
+
+  isTyping = true;
+  sendBtn.disabled = true;
+  userInput.value = '';
+  autoResize();
+
+  // Add user message
+  addMessage(text, 'user');
+  conversationHistory.push({ role: 'user', content: text });
+
+  // Show typing
+  showTyping();
+
+  // Simulate response delay (varies by response length for realism)
+  const response = generateResponse(text);
+  const delay = Math.min(800 + response.length * 2, 2500);
+
+  await new Promise(resolve => setTimeout(resolve, delay));
+
+  hideTyping();
+  addMessage(response, 'chloe');
+  conversationHistory.push({ role: 'chloe', content: response });
+
+  isTyping = false;
+  sendBtn.disabled = !userInput.value.trim();
+  userInput.focus();
+}
+
+function autoResize() {
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 100) + 'px';
+}
+
+// ---- Event Listeners ----
+
+userInput.addEventListener('input', () => {
+  autoResize();
+  sendBtn.disabled = !userInput.value.trim() || isTyping;
+});
+
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
+sendBtn.addEventListener('click', handleSend);
+
+clearChatBtn.addEventListener('click', () => {
+  conversationHistory = [];
+  messageCount = 0;
+  messagesContainer.innerHTML = '';
+  messagesContainer.style.display = 'none';
+  welcomeState.style.display = 'flex';
+  msgCountEl.textContent = '0 messages';
+  userInput.focus();
+});
+
+// Quick prompts (sidebar + welcome cards)
+document.querySelectorAll('[data-prompt]').forEach(el => {
+  el.addEventListener('click', () => {
+    const prompt = el.getAttribute('data-prompt');
+    userInput.value = prompt;
+    autoResize();
+    sendBtn.disabled = false;
+    handleSend();
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      el.click();
     }
+  });
+});
 
-    function scrollToBottom() {
-      mainContainer.scrollTop = mainContainer.scrollHeight;
-    }
-
-    async function sendMessage() {
-      const message = chatInput.value.trim();
-      if (!message) return;
-
-      if (introSection.style.display !== 'none') {
-        introSection.style.display = 'none';
-      }
-
-      appendMessage('user', message);
-      chatInput.value = "";
-      checkInput();
-
-      typingIndicator.style.display = 'inline-block';
-      scrollToBottom();
-
-      try {
-        const response = await fetch('http://localhost:3000/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: message })
-        });
-
-        const data = await response.json();
-        
-        typingIndicator.style.display = 'none';
-        appendMessage('chloe', data.reply);
-
-      } catch (error) {
-        typingIndicator.style.display = 'none';
-        appendMessage('chloe', "Oops! I lost my connection for a second. Let's try that again 🎀");
-      }
-    }
-
-    chatInput.addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
-  </script>
+// Focus input on load
+userInput.focus();
+</script>
 </body>
 </html>
